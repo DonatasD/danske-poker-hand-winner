@@ -1,11 +1,14 @@
 package com.donatasd.domain;
 
+import lombok.ToString;
+
 /**
  * @author Donatas Daubaras
  */
+@ToString
 public enum Rank {
 
-  Ace("A", 14), King("K", 13), Queen("Q", 12), Jack("J", 11), Ten("10", 10), Nine("9", 9),
+  Ace("A", 14), King("K", 13), Queen("Q", 12), Jack("J", 11), Ten("T", 10), Nine("9", 9),
   Eight("8", 8), Seven("7", 7), Six("6", 6), Five("5", 5), Four("4", 4), Three("3", 3), Two("2", 2);
 
   private final String representation;

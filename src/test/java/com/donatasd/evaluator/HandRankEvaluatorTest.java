@@ -23,7 +23,7 @@ public class HandRankEvaluatorTest {
         Card.builder().suit(Suit.Heart).rank(Rank.Jack).build(),
         Card.builder().suit(Suit.Heart).rank(Rank.Ten).build()
     );
-    assertEquals(HandRankEvaluator.evaluateHandRank(hand), HandRank.RoyalFlush);
+    assertEquals(HandRank.RoyalFlush, HandRankEvaluator.evaluateHandRank(hand));
   }
   @Test
   public void evaluateHandRankDetectStraightFlush() {
@@ -34,7 +34,7 @@ public class HandRankEvaluatorTest {
         Card.builder().suit(Suit.Heart).rank(Rank.Jack).build(),
         Card.builder().suit(Suit.Heart).rank(Rank.Ten).build()
     );
-    assertEquals(HandRankEvaluator.evaluateHandRank(hand), HandRank.StraightFlush);
+    assertEquals(HandRank.StraightFlush, HandRankEvaluator.evaluateHandRank(hand));
   }
 
   @Test
@@ -46,7 +46,7 @@ public class HandRankEvaluatorTest {
         Card.builder().suit(Suit.Club).rank(Rank.Nine).build(),
         Card.builder().suit(Suit.Heart).rank(Rank.Ten).build()
     );
-    assertEquals(HandRankEvaluator.evaluateHandRank(hand), HandRank.FourOfKind);
+    assertEquals(HandRank.FourOfKind, HandRankEvaluator.evaluateHandRank(hand));
   }
 
   @Test
@@ -58,7 +58,7 @@ public class HandRankEvaluatorTest {
         Card.builder().suit(Suit.Club).rank(Rank.Ten).build(),
         Card.builder().suit(Suit.Heart).rank(Rank.Ten).build()
     );
-    assertEquals(HandRankEvaluator.evaluateHandRank(hand), HandRank.FullHouse);
+    assertEquals(HandRank.FullHouse, HandRankEvaluator.evaluateHandRank(hand));
   }
 
   @Test
@@ -70,7 +70,7 @@ public class HandRankEvaluatorTest {
         Card.builder().suit(Suit.Heart).rank(Rank.Five).build(),
         Card.builder().suit(Suit.Heart).rank(Rank.Ten).build()
     );
-    assertEquals(HandRankEvaluator.evaluateHandRank(hand), HandRank.Flush);
+    assertEquals(HandRank.Flush, HandRankEvaluator.evaluateHandRank(hand));
   }
 
   @Test
@@ -82,7 +82,7 @@ public class HandRankEvaluatorTest {
         Card.builder().suit(Suit.Heart).rank(Rank.Eight).build(),
         Card.builder().suit(Suit.Heart).rank(Rank.Ten).build()
     );
-    assertEquals(HandRankEvaluator.evaluateHandRank(hand), HandRank.Straight);
+    assertEquals(HandRank.Straight, HandRankEvaluator.evaluateHandRank(hand));
   }
 
   @Test
@@ -94,7 +94,7 @@ public class HandRankEvaluatorTest {
         Card.builder().suit(Suit.Heart).rank(Rank.Eight).build(),
         Card.builder().suit(Suit.Heart).rank(Rank.Ten).build()
     );
-    assertEquals(HandRankEvaluator.evaluateHandRank(hand), HandRank.ThreeOfKind);
+    assertEquals(HandRank.ThreeOfKind, HandRankEvaluator.evaluateHandRank(hand));
   }
 
   @Test
@@ -106,7 +106,7 @@ public class HandRankEvaluatorTest {
         Card.builder().suit(Suit.Heart).rank(Rank.Eight).build(),
         Card.builder().suit(Suit.Heart).rank(Rank.Ten).build()
     );
-    assertEquals(HandRankEvaluator.evaluateHandRank(hand), HandRank.TwoPair);
+    assertEquals(HandRank.TwoPair, HandRankEvaluator.evaluateHandRank(hand));
   }
 
   @Test
@@ -118,7 +118,7 @@ public class HandRankEvaluatorTest {
         Card.builder().suit(Suit.Heart).rank(Rank.Eight).build(),
         Card.builder().suit(Suit.Heart).rank(Rank.Ten).build()
     );
-    assertEquals(HandRankEvaluator.evaluateHandRank(hand), HandRank.OnePair);
+    assertEquals(HandRank.OnePair, HandRankEvaluator.evaluateHandRank(hand));
   }
 
   @Test
@@ -130,7 +130,7 @@ public class HandRankEvaluatorTest {
         Card.builder().suit(Suit.Heart).rank(Rank.Eight).build(),
         Card.builder().suit(Suit.Heart).rank(Rank.Ten).build()
     );
-    assertEquals(HandRankEvaluator.evaluateHandRank(hand), HandRank.HighCard);
+    assertEquals(HandRank.HighCard, HandRankEvaluator.evaluateHandRank(hand));
   }
 
 }

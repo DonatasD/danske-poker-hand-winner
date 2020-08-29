@@ -18,7 +18,7 @@ public class CardReaderTest {
 
   @Test
   public void readPlayerCards() {
-    var playerCards =  CardReader.readPlayerCards(List.of("AH", "AD", "10C", "2C", "5S"));
+    var playerCards =  CardReader.readPlayerCards(List.of("AH", "AD", "TC", "2C", "5S"));
     var expectedPlayerCards = List.of(
         Card.builder().rank(Rank.Ace).suit(Suit.Heart).build(),
         Card.builder().rank(Rank.Ace).suit(Suit.Diamond).build(),

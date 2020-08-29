@@ -1,8 +1,11 @@
 package com.donatasd.domain;
 
+import lombok.ToString;
+
 /**
  * @author Donatas Daubaras
  */
+@ToString
 public enum Suit {
   Diamond("D"),
   Club("C"),
