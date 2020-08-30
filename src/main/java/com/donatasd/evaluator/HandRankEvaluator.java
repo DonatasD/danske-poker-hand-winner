@@ -6,49 +6,114 @@ import com.donatasd.domain.Rank;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @author Donatas Daubaras
  */
 public class HandRankEvaluator {
 
-  protected static HandRank evaluateHandRank(List<Card> hand) {
-    var sortedByRank =
-        hand.stream().sorted(((card1, card2) -> card1.getRank().getValue() - card2.getRank().getValue())).collect(
-            Collectors.toList());
-    if (isRoyalFlush(sortedByRank)) {
-      return HandRank.RoyalFlush;
-    }
-    if (isStraightFlush(sortedByRank)) {
-      return HandRank.StraightFlush;
-    }
-    if (isFourOfKind(sortedByRank)) {
-      return HandRank.FourOfKind;
-    }
-    if (isFullHouse(sortedByRank)) {
-      return HandRank.FullHouse;
-    }
-    if (isFlush(sortedByRank)) {
-      return HandRank.Flush;
-    }
-    if (isStraight(sortedByRank)) {
-      return HandRank.Straight;
-    }
-    if (isThreeOfKind(sortedByRank)) {
-      return HandRank.ThreeOfKind;
-    }
-    if (isTwoPair(sortedByRank)) {
-      return HandRank.TwoPair;
-    }
-    if (isPair(sortedByRank)) {
-      return HandRank.OnePair;
-    }
-    return HandRank.HighCard;
+  public static boolean isPlayer1Winner(List<Card> player1Hand, List<Card> player2Hand) {
+    return evaluateHandRank(player1Hand).getValue() > evaluateHandRank(player2Hand).getValue();
   }
 
-  private static boolean isRoyalFlush(List<Card> sortedHand) {
-      return isFlush(sortedHand) && isStraight(sortedHand) && findHighCard(sortedHand).getRank().equals(Rank.Ace);
+  protected static Map.Entry<HandRank, Integer> evaluateHandRank(List<Card> hand) {
+    var sortedByRank = hand
+        .stream()
+        .sorted((card1, card2) -> Integer.compare(card1.getRank().getValue(),
+            card2.getRank().getValue()))
+        .collect(Collectors.toList());
+    var duplicateMap = getDuplicateMap(sortedByRank);
+    if (isStraightFlush(sortedByRank)) {
+      return Map.entry(
+          HandRank.StraightFlush,
+          HandRank.StraightFlush.getValue() + getValueBasedOnCardRanks(sortedByRank)
+      );
+    }
+    if (isFourOfKind(sortedByRank, duplicateMap)) {
+      return Map.entry(
+          HandRank.FourOfKind,
+          HandRank.FourOfKind.getValue() + sortedByRank.get(2).getRank().getValue()
+      );
+    }
+    if (isFullHouse(sortedByRank, duplicateMap)) {
+      return Map.entry(
+          HandRank.FullHouse,
+          HandRank.FullHouse.getValue() + sortedByRank.get(2).getRank().getValue()
+      );
+    }
+    if (isFlush(sortedByRank)) {
+      return Map.entry(
+          HandRank.Flush,
+          HandRank.Flush.getValue() + getValueBasedOnCardRanks(sortedByRank)
+      );
+    }
+    if (isStraight(sortedByRank)) {
+      return Map.entry(
+          HandRank.Straight,
+          HandRank.Straight.getValue() + getValueBasedOnCardRanks(sortedByRank)
+      );
+    }
+    if (isThreeOfKind(sortedByRank, duplicateMap)) {
+      return Map.entry(
+          HandRank.ThreeOfKind,
+          HandRank.ThreeOfKind.getValue() + sortedByRank.get(2).getRank().getValue()
+      );
+    }
+    if (isTwoPair(sortedByRank, duplicateMap)) {
+      var biggerPair = duplicateMap
+          .entrySet()
+          .stream()
+          .filter(entry -> entry.getValue() == 2)
+          .map(Entry::getKey)
+          .max(Integer::compare)
+          .orElse(0);
+      var smallerPair = duplicateMap
+          .entrySet()
+          .stream()
+          .filter(entry -> entry.getValue() == 2)
+          .map(Entry::getKey)
+          .min(Integer::compare)
+          .orElse(0);
+      var highCard = duplicateMap
+          .entrySet()
+          .stream()
+          .filter(entry -> entry.getValue() == 1)
+          .map(entry -> entry.getKey())
+          .findFirst()
+          .orElse(0);
+      return Map.entry(
+          HandRank.TwoPair,
+          (int) (HandRank.TwoPair.getValue() + (biggerPair * Math.pow(14, 2)) + (smallerPair * 14)
+              + highCard)
+      );
+    }
+    if (isPair(sortedByRank, duplicateMap)) {
+      var pair = duplicateMap
+          .entrySet()
+          .stream()
+          .filter(entry -> entry.getValue() == 2)
+          .map(Entry::getKey)
+          .findFirst()
+          .orElse(0);
+      var sortedHighCards = sortedByRank
+          .stream()
+          .filter(card -> card.getRank().getValue() != pair)
+          .sorted((card1, card2) -> Integer
+              .compare(card1.getRank().getValue(), card2.getRank().getValue()))
+          .collect(Collectors.toList());
+      return Map.entry(
+          HandRank.OnePair,
+          (int) (HandRank.OnePair.getValue() + pair * Math.pow(14, 3) + getValueBasedOnCardRanks(
+              sortedHighCards))
+      );
+    }
+    return Map.entry(
+        HandRank.HighCard,
+        HandRank.HighCard.getValue() + getValueBasedOnCardRanks(sortedByRank)
+    );
   }
 
   private static boolean isStraightFlush(List<Card> sortedHand) {
@@ -59,46 +124,39 @@ public class HandRankEvaluator {
     return sortedHand.stream().map(Card::getSuit).distinct().count() == 1;
   }
 
-  private static boolean isFourOfKind(List<Card> sortedHand) {
-    var duplicateCounter = getDuplicateMap(sortedHand);
-    return duplicateCounter.values().stream().filter(count -> count == 4).findAny().isPresent();
+  private static boolean isFourOfKind(List<Card> sortedHand, Map<Integer, Integer> duplicateMap) {
+    return duplicateMap.values().stream().filter(count -> count == 4).findAny().isPresent();
   }
 
-  private static boolean isFullHouse(List<Card> sortedHand) {
-    var duplicateCounter = getDuplicateMap(sortedHand);
-    return isThreeOfKind(sortedHand) && isPair(sortedHand);
+  private static boolean isFullHouse(List<Card> sortedHand, Map<Integer, Integer> duplicateMap) {
+    return isThreeOfKind(sortedHand, duplicateMap) && isPair(sortedHand, duplicateMap);
   }
 
   private static boolean isStraight(List<Card> sortedHand) {
     if (sortedHand.get(sortedHand.size() - 1).getRank().equals(Rank.Ace)) {
-      if (sortedHand.get(0).getRank().equals(Rank.Two) || sortedHand.get(0).getRank().equals(Rank.Ten)) {
+      if (sortedHand.get(0).getRank().equals(Rank.Two) || sortedHand.get(0).getRank()
+          .equals(Rank.Ten)) {
         return isInOrder(sortedHand.subList(0, sortedHand.size() - 2));
       }
     }
     return isInOrder(sortedHand);
   }
 
-  private static boolean isThreeOfKind(List<Card> sortedHand) {
-    var duplicateCounter = getDuplicateMap(sortedHand);
-    return duplicateCounter.values().stream().filter(count -> count == 3).findAny().isPresent();
+  private static boolean isThreeOfKind(List<Card> sortedHand, Map<Integer, Integer> duplicateMap) {
+    return duplicateMap.values().stream().filter(count -> count == 3).findAny().isPresent();
   }
 
-  private static boolean isTwoPair(List<Card> sortedHand) {
-    var duplicateCounter = getDuplicateMap(sortedHand);
-    return duplicateCounter.values().stream().filter(count -> count == 2).count() == 2;
+  private static boolean isTwoPair(List<Card> sortedHand, Map<Integer, Integer> duplicateMap) {
+    return duplicateMap.values().stream().filter(count -> count == 2).count() == 2;
   }
 
-  private static boolean isPair(List<Card> sortedHand) {
-    var duplicateCounter = getDuplicateMap(sortedHand);
-    return duplicateCounter.values().stream().filter(count -> count == 2).findAny().isPresent();
-  }
-
-  private static Card findHighCard(List<Card> sortedHand) {
-    return sortedHand.get(sortedHand.size() - 1);
+  private static boolean isPair(List<Card> sortedHand, Map<Integer, Integer> duplicateMap) {
+    return duplicateMap.values().stream().filter(count -> count == 2).findAny().isPresent();
   }
 
   private static boolean isInOrder(List<Card> sortedHand) {
-    var ranks = sortedHand.stream().map(Card::getRank).map(Rank::getValue).collect(Collectors.toList());
+    var ranks = sortedHand.stream().map(Card::getRank).map(Rank::getValue)
+        .collect(Collectors.toList());
     for (int i = 1; i < ranks.size(); i++) {
       if (ranks.get(i) != (ranks.get(i - 1) + 1)) {
         return false;
@@ -114,5 +172,13 @@ public class HandRankEvaluator {
         duplicateCounter.getOrDefault(card.getRank().getValue(), 0) + 1
     ));
     return duplicateCounter;
+  }
+
+  private static int getValueBasedOnCardRanks(List<Card> sortedHand) {
+    return IntStream.range(0, sortedHand.size()).reduce(
+        0,
+        (total, index) -> (int) (total + (Math.pow(14, index) * sortedHand.get(index).getRank()
+            .getValue()))
+    );
   }
 }

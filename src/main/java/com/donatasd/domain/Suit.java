@@ -23,8 +23,8 @@ public enum Suit {
   }
 
   public static Suit findByRepresentation(String representation) throws IllegalArgumentException {
-    for(Suit suit : values()){
-      if(suit.getRepresentation().equals(representation)){
+    for (Suit suit : values()) {
+      if (suit.getRepresentation().equals(representation)) {
         return suit;
       }
     }

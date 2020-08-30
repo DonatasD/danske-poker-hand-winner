@@ -1,6 +1,7 @@
 package com.donatasd.reader;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.donatasd.domain.Card;
 import com.donatasd.domain.Rank;
@@ -18,7 +19,7 @@ public class CardReaderTest {
 
   @Test
   public void readPlayerCards() {
-    var playerCards =  CardReader.readPlayerCards(List.of("AH", "AD", "TC", "2C", "5S"));
+    var playerCards = CardReader.readPlayerCards(List.of("AH", "AD", "TC", "2C", "5S"));
     var expectedPlayerCards = List.of(
         Card.builder().rank(Rank.Ace).suit(Suit.Heart).build(),
         Card.builder().rank(Rank.Ace).suit(Suit.Diamond).build(),

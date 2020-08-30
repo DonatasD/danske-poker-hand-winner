@@ -28,8 +28,8 @@ public enum Rank {
   }
 
   public static Rank findByRepresentation(String representation) throws IllegalArgumentException {
-    for(Rank rank : values()){
-      if(rank.getRepresentation().equals(representation)){
+    for (Rank rank : values()) {
+      if (rank.getRepresentation().equals(representation)) {
         return rank;
       }
     }

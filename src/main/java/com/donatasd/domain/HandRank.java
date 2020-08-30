@@ -1,13 +1,12 @@
 package com.donatasd.domain;
 
-import lombok.Data;
-
 /**
  * @author Donatas Daubaras
  */
 public enum HandRank {
-  RoyalFlush(10), StraightFlush(9), FourOfKind(8), FullHouse(7), Flush(6), Straight(5),
-  ThreeOfKind(4), TwoPair(3), OnePair(2), HighCard(1);
+  StraightFlush(8000000), FourOfKind(6000000), FullHouse(6000000), Flush(5000000), Straight(
+      4000000),
+  ThreeOfKind(3000000), TwoPair(2000000), OnePair(1000000), HighCard(0);
 
   private final int value;
 
